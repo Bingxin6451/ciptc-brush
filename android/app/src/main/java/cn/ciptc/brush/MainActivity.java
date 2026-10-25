@@ -58,6 +58,7 @@ public class MainActivity extends Activity {
     Button btnGo, btnCookie, btnRefresh;
     LinearLayout pwdBox, cookieBox;
     String pagehash = "", hiddenRef = "";
+    long pageTs = 0;   // 页面加载时间戳, 登录POST必须用同一个ct
     boolean cookieMode = false;
     byte[] curCap = null;
 
@@ -258,19 +259,20 @@ public class MainActivity extends Activity {
     void loadCaptcha() {
         new Thread(() -> {
             try {
-                if (pagehash.isEmpty()) {
-                    String html = http("GET", SSO + "/account/login.shtml?t=" + System.currentTimeMillis() / 1000
-                            + "&referer=" + urlencode(BASE + "/login"), null, null, null).text();
-                    Matcher m = Pattern.compile("name=\"pagehash\"[^>]*value=\"([^\"]*)\"").matcher(html);
-                    if (m.find()) pagehash = m.group(1);
-                    Matcher m2 = Pattern.compile("name=\"referer\"[^>]*value=\"([^\"]*)\"").matcher(html);
-                    hiddenRef = m2.find() ? m2.group(1).replace("&amp;", "&") : BASE + "/login";
-                }
+                long ts = System.currentTimeMillis() / 1000;
+                String html = http("GET", SSO + "/account/login.shtml?t=" + ts
+                        + "&referer=" + urlencode(BASE + "/login"), null, null, null).text();
+                Matcher m = Pattern.compile("name=\"pagehash\"[^>]*value=\"([^\"]*)\"").matcher(html);
+                if (m.find()) pagehash = m.group(1);
+                Matcher m2 = Pattern.compile("name=\"referer\"[^>]*value=\"([^\"]*)\"").matcher(html);
+                hiddenRef = m2.find() ? m2.group(1).replace("&amp;", "&") : BASE + "/login";
+                pageTs = ts;
                 String capUrl = SSO + "/csi_verifycode.php?pagehash=" + pagehash + "&rand=" + (10000 + (int) (Math.random() * 89999));
                 HttpResponse r = http("GET", capUrl, null, null, SSO + "/account/login.shtml");
                 curCap = r.data;
                 final Bitmap bmp = BitmapFactory.decodeByteArray(r.data, 0, r.data.length);
                 if (bmp != null) runOnUiThread(() -> ivCode.setImageBitmap(bmp));
+                addLog("[*] 验证码已刷新");
             } catch (Exception e) {
                 addLog("[!] 验证码加载失败: " + e);
             }
@@ -325,7 +327,7 @@ public class MainActivity extends Activity {
     }
 
     boolean login(String user, String pwd, String code) {
-        long ts = System.currentTimeMillis() / 1000;
+        long ts = pageTs > 0 ? pageTs : System.currentTimeMillis() / 1000;
         String loginUrl = SSO + "/account/login.shtml?t=" + ts + "&referer=" + urlencode(BASE + "/login");
         if (pagehash.isEmpty()) {
             String html = http("GET", loginUrl, null, null, null).text();
@@ -352,7 +354,15 @@ public class MainActivity extends Activity {
             http("GET", BASE + "/home/student/index", null, null, null);
         }
         String chk = http("GET", BASE + "/home/student/nowLearn?_=" + System.currentTimeMillis(), null, null, null).text();
-        return chk.contains("selecthours") && chk.contains("_learn_first_courseware");
+        boolean ok = chk.contains("selecthours") && chk.contains("_learn_first_courseware");
+        if (!ok) {
+            String diag = resp.replaceAll("\\s+", " ").replaceAll("<[^>]+>", " ");
+            addLog("[诊断] POST响应片段: " + (diag.length() > 120 ? diag.substring(0, 120) : diag));
+            addLog("[诊断] nowLearn片段: " + (chk.length() > 120 ? chk.substring(0, 120) : chk));
+            pagehash = "";
+            runOnUiThread(() -> loadCaptcha());  // 失败后自动换新验证码
+        }
+        return ok;
     }
 
     // ---------------- 刷课 ----------------

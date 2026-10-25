@@ -39,7 +39,7 @@ jobs:
         uses: ncipollo/release-action@v1
         with:
           artifacts: "android/app/build/outputs/apk/release/app-release.apk"
-          tag: apk1
+          tag: apk2
           allowUpdates: true
-          name: "ciptc_brush APK v1"
+          name: "ciptc_brush APK v2"
           token: ${{ secrets.GITHUB_TOKEN }}
