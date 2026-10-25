@@ -260,7 +260,7 @@ public class MainActivity extends Activity {
             try {
                 if (pagehash.isEmpty()) {
                     String html = http("GET", SSO + "/account/login.shtml?t=" + System.currentTimeMillis() / 1000
-                            + "&referer=" + urlencode(BASE + "/login"), null, null, null, null).text();
+                            + "&referer=" + urlencode(BASE + "/login"), null, null, null).text();
                     Matcher m = Pattern.compile("name=\"pagehash\"[^>]*value=\"([^\"]*)\"").matcher(html);
                     if (m.find()) pagehash = m.group(1);
                     Matcher m2 = Pattern.compile("name=\"referer\"[^>]*value=\"([^\"]*)\"").matcher(html);
@@ -328,7 +328,7 @@ public class MainActivity extends Activity {
         long ts = System.currentTimeMillis() / 1000;
         String loginUrl = SSO + "/account/login.shtml?t=" + ts + "&referer=" + urlencode(BASE + "/login");
         if (pagehash.isEmpty()) {
-            String html = http("GET", loginUrl, null, null, null, null).text();
+            String html = http("GET", loginUrl, null, null, null).text();
             Matcher m = Pattern.compile("name=\"pagehash\"[^>]*value=\"([^\"]*)\"").matcher(html);
             if (m.find()) pagehash = m.group(1);
             Matcher m2 = Pattern.compile("name=\"referer\"[^>]*value=\"([^\"]*)\"").matcher(html);
