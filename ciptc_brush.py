@@ -40,6 +40,40 @@ UA = ("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 "
 IMG_DIR = os.path.expanduser("~/.ciptc_brush")
 CONFIG_FILE = os.path.join(IMG_DIR, "config.ini")
 
+USAGE = """
+══════════════════════ 使用说明 (Windows / 安卓通用) ══════════════════════
+
+【是什么】
+自动刷课工具：输一次账号密码和验证码，自动登录并刷完你所有班级的所有
+课程，学习时长与知识点覆盖率自动补满，课程得分直接 100 分。
+
+【使用】(约 1 分钟)
+1. 打开工具
+2. 输入账号(手机号)和密码(密码是明文显示的)
+3. 看弹出的验证码图片，输入 4 位验证码（看不清点图片换一张）
+4. 点「登录并一键刷课」(安卓) / 选 "2" 回车 (Windows)
+5. 等它跑完，出现"全部完成"即刷完
+6. 各课程 100 分即通过；成绩可在平台「我的课程 → 查看学习情况」核对
+
+【登录方式】
+- 账号密码登录：普通人用这个（推荐）
+- Cookie 登录：会复制 Cookie 的人用，整串粘贴即可
+- 只查看学习情况：只看分数学时，不做任何修改
+
+【隐私说明】
+- 工具完全本地运行，只连接学习平台官方服务器(suining/sso/resource.ciptc.org.cn)，
+  不经过任何第三方，账号密码不上传、不记录到别处。
+- 账号密码一次性使用，用完即弃，不保存到本地。
+- 代码开源，可自行审查或抓包验证。
+
+【常见问题】
+- 登录失败：核对账号密码；验证码过期就点图换新再输。
+- Windows 弹窗一闪而过：右键以管理员身份运行。
+- 杀毒软件报毒：自签名脚本属误报，加入信任区即可。
+- 默认刷全部班级全部课程，无需手动选。
+════════════════════════════════════════════════════════════════════════
+"""
+
 
 def load_config():
     """读取本地配置(username/password), 免重复输入"""
@@ -399,17 +433,23 @@ def main():
     has_cli = any([args.cookie, args.cookie_file, args.username, args.password,
                    args.verifycode, args.only_class, args.skip_class, args.target_min])
     if not has_cli:
-        print("=" * 52)
-        print("    ciptc 平台一键刷课工具 (全自动刷完所有课程)")
-        print("=" * 52)
-        print("  [1] 使用 Cookie 登录")
-        print("  [2] 使用账号密码登录 (自动弹出验证码图片)")
-        print("  [3] 只查看学习情况, 不提交 (dry-run)")
-        print("-" * 52)
-        try:
-            choice = input("请选择 [1/2/3]: ").strip() or "2"
-        except (EOFError, KeyboardInterrupt):
-            sys.exit(0)
+        while True:
+            print("=" * 52)
+            print("    ciptc 平台一键刷课工具 (全自动刷完所有课程)")
+            print("=" * 52)
+            print("  [1] 使用 Cookie 登录")
+            print("  [2] 使用账号密码登录 (自动弹出验证码图片)")
+            print("  [3] 只查看学习情况, 不提交 (dry-run)")
+            print("  [4] 查看使用说明")
+            print("-" * 52)
+            try:
+                choice = input("请选择 [1/2/3/4]: ").strip() or "2"
+            except (EOFError, KeyboardInterrupt):
+                sys.exit(0)
+            if choice == "4":
+                print(USAGE)
+                continue
+            break
         if choice == "1":
             ck = input("请粘贴 Cookie 内容 (或输入 cookies.txt 文件路径): ").strip().strip('"')
             if not ck:
