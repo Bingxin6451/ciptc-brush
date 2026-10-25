@@ -32,7 +32,7 @@ jobs:
         uses: ncipollo/release-action@v1
         with:
           artifacts: "dist/ciptc_brush.exe"
-          tag: v1
+          tag: ${{ github.ref_name }}
           allowUpdates: true
-          name: "ciptc_brush v1"
+          name: "ciptc_brush ${{ github.ref_name }}"
           token: ${{ secrets.GITHUB_TOKEN }}

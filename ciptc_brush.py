@@ -406,10 +406,6 @@ def main():
         print("  [2] 使用账号密码登录 (自动弹出验证码图片)")
         print("  [3] 只查看学习情况, 不提交 (dry-run)")
         print("-" * 52)
-        cfg = load_config()
-        if cfg.get("username"):
-            print(f"  已记住账号: {cfg.get('username')} (选2时免输, 回车即可)")
-            print("-" * 52)
         try:
             choice = input("请选择 [1/2/3]: ").strip() or "2"
         except (EOFError, KeyboardInterrupt):
@@ -423,7 +419,6 @@ def main():
             args.cookie = ck
         elif choice == "3":
             args.dry_run = True
-            # dry-run也走登录
         elif choice not in ("1", "2", "3"):
             print("无效选择"); _pause(); sys.exit(1)
 
@@ -436,23 +431,18 @@ def main():
         n = load_cookie_string(ck)
         print(f"[OK] 已注入 {n} 个 cookie")
     else:
-        cfg = load_config()
-        if not args.username:
-            if cfg.get("username") and (not args.password):
-                print(f"[*] 使用已记住的账号: {cfg.get('username')} (想换账号请加 --username 参数)")
-                args.username = cfg["username"]
-                args.password = cfg.get("password", "")
-            else:
-                try:
-                    args.username = input("账号(手机号): ").strip()
-                except (EOFError, KeyboardInterrupt):
-                    sys.exit(0)
-        if not args.password:
-            args.password = getpass.getpass("密码: ")
-        user, pwd = args.username, args.password
+        # 一次性使用: 账号密码只在本次运行内存中, 不保存到本地
+        user = args.username
+        pwd = args.password
+        if not user:
+            try:
+                user = input("账号(手机号): ").strip()
+            except (EOFError, KeyboardInterrupt):
+                sys.exit(0)
+        if not pwd:
+            pwd = getpass.getpass("密码: ")
         if not user or not pwd:
             print("账号/密码不能为空"); _pause(); sys.exit(1)
-        save_config(user, pwd)  # 记住, 下次免输入
         print("[*] 正在登录...")
         if not login_password(args.base, user, pwd, args.verifycode or None):
             _pause(); sys.exit(1)

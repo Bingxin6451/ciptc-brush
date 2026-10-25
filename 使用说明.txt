@@ -24,8 +24,7 @@ Windows：双击运行  ciptc_brush.exe（无需安装任何环境）
 【隐私说明】
 - 工具完全本地运行，只连接学习平台官方服务器（suining/sso/resource.ciptc.org.cn），
   不经过任何第三方，账号密码不上传、不记录到别处。
-- 安卓版密码只在内存中，不保存；Windows 版记住在本机
-  C:\Users\你的用户名\.ciptc_brush\config.ini，删除该文件即彻底清除。
+- 账号密码一次性使用，用完即弃，不保存到本地（Windows 和安卓都一样）。
 - 代码开源，可自行审查或抓包验证。
 
 【常见问题】
