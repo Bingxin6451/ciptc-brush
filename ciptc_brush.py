@@ -440,7 +440,7 @@ def main():
             except (EOFError, KeyboardInterrupt):
                 sys.exit(0)
         if not pwd:
-            pwd = getpass.getpass("密码: ")
+            pwd = input("密码(明文显示): ")
         if not user or not pwd:
             print("账号/密码不能为空"); _pause(); sys.exit(1)
         print("[*] 正在登录...")
