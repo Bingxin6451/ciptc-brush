@@ -7,6 +7,11 @@ ciptc 平台一键刷课工具（Windows 版）— 使用说明
 课程得分直接 100 分）。
 不用安装任何软件，不需要 VPN，电脑能打开学习平台就能用。
 
+【下载与源码】
+- exe 下载: https://github.com/Bingxin6451/ciptc-brush/releases/download/v4/ciptc_brush.exe
+- 源码仓库: https://github.com/Bingxin6451/ciptc-brush
+  （全部代码公开，含自动构建配置，可自行审查是否有数据上报）
+
 【使用方法】（约 1 分钟）
 1. 双击运行  ciptc_brush.exe
 2. 出现菜单，输入 2 回车（使用账号密码登录）
